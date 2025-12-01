@@ -7,6 +7,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -16,6 +22,10 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 public class ClientPrep extends JFrame implements KeyListener, ActionListener {
+	
+	// Ports
+	private final int SERVER_PORT = 5556;
+	private final int CLIENT_PORT = 5656;
     
 	// Character / objects declarations
     private Miner miner;
@@ -538,7 +548,38 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
 		contentPane.setFocusable(true);
 		gameOverMenu.setVisible(false);
 		
-        
+		Thread t1 = new Thread (() -> {	
+				ServerSocket client;
+				
+				try {
+					
+					client = new ServerSocket(CLIENT_PORT);
+					while(true) {
+						Socket s2;
+						try {
+							s2 = client.accept();
+							MinerGameClientService myService = new MinerGameClientService (s2, this);
+							Thread t2 = new Thread(myService);
+							t2.start();
+								
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						System.out.println("client connected");
+						
+					}
+				
+				} catch (IOException e) {
+					
+					e.printStackTrace();
+				}
+				System.out.println("Waiting for server responses...");
+	
+			}
+		);
+		
+		t1.start( );
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
@@ -568,49 +609,26 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
 		int x = miner.getX();
 		int y = miner.getY();
 		
+		String command = "";
+		
 		if ( e.getKeyCode() == KeyEvent.VK_UP ) {
 			
-			y -= MinerGameProperties.CHARACTER_STEP;
-			
-			miner.setImage("imageAssets/minerFacingAway.png");
-			updateMinerImage();
-			
-			if (y + miner.getHeight() <= 0) {
-				y = MinerGameProperties.SCREEN_HEIGHT;
-			}
-			
+			command = "MOVEMINER UP\n";
+				
 		} else if ( e.getKeyCode() == KeyEvent.VK_DOWN ) {
 			
-			y += MinerGameProperties.CHARACTER_STEP;
+			command = "MOVEMINER DOWN\n";
 			
-			miner.setImage("imageAssets/minerFacingFront.png");
-			updateMinerImage();
-			
-			if (y > MinerGameProperties.SCREEN_HEIGHT) {
-				y = -1 * miner.getHeight();
-			}
 			
 		} else if ( e.getKeyCode() == KeyEvent.VK_LEFT ) {
 			
-			x -= MinerGameProperties.CHARACTER_STEP;
+			command = "MOVEMINER LEFT\n";
 			
-			miner.setImage("imageAssets/minerFacingLeft.png");
-			updateMinerImage();
-			
-			if (x + miner.getWidth() <= 0) {
-				x = MinerGameProperties.SCREEN_WIDTH;
-			}
 			
 		} else if ( e.getKeyCode() == KeyEvent.VK_RIGHT ) {
 			
-			x += MinerGameProperties.CHARACTER_STEP;
+			command = "MOVEMINER RIGHT\n";
 			
-			miner.setImage("imageAssets/minerFacingRight.png");
-			updateMinerImage();
-			
-			if (x >= MinerGameProperties.SCREEN_WIDTH) {
-				x = -1 * miner.getWidth();
-			}
 			
 		} else {
 			
@@ -618,14 +636,27 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
 			
 		}
 		
-		miner.setX(x);
-		miner.setY(y);
-		
-		lblMiner.setLocation(miner.getX(), miner.getY() );
-		
-		if (miner.getY() <= -10) {
-			gameWon();
+		if (!command.equals("")) {
+			try {
+				Socket s = new Socket("localhost", SERVER_PORT);
+				PrintWriter out = new PrintWriter(s.getOutputStream());
+				out.println(command);
+				out.flush();
+				s.close();
+				
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
+		
+//		miner.setX(x);
+//		miner.setY(y);
+//		
+//		lblMiner.setLocation(miner.getX(), miner.getY() );
+//		
+//		if (miner.getY() <= -10) {
+//			gameWon();
+//		}
 		
 	}
     
@@ -653,13 +684,13 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
     	for (int i=0; i < mineCartsArray.length; i++) {
     		mineCartsArray[i].setMiner(miner);
     		mineCartsArray[i].setMinerLabel(lblMiner);
-    		mineCartsArray[i].startThread();
+//    		mineCartsArray[i].startThread();
     	}
     	
     	for (int i=0; i < movingStonesArray.length; i++) {
     		movingStonesArray[i].setMiner(miner);
     		movingStonesArray[i].setMinerLabel(lblMiner);
-    		movingStonesArray[i].startThread();
+//    		movingStonesArray[i].startThread();
     	}
     	startCollisionChecker();
     	
@@ -691,13 +722,13 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
     	for (int i=0; i < mineCartsArray.length; i++) {
     		mineCartsArray[i].setMiner(miner);
     		mineCartsArray[i].setMinerLabel(lblMiner);
-    		mineCartsArray[i].stopThread();
+//    		mineCartsArray[i].stopThread();
     	}
     	
     	for (int i=0; i < movingStonesArray.length; i++) {
     		movingStonesArray[i].setMiner(miner);
     		movingStonesArray[i].setMinerLabel(lblMiner);
-    		movingStonesArray[i].stopThread();
+//    		movingStonesArray[i].stopThread();
     	}
     }
     
@@ -752,13 +783,13 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
                         // Stop all mine carts
                         MineCarts[] mineCartsArray = {minecart_1, minecart_2, minecart_3, minecart_4};
                         for (MineCarts cart : mineCartsArray) {
-                            cart.stopThread();
+//                            cart.stopThread();
                         }
                         
                         // Stop all stones
                         movingStones[] movingStonesArray = {stone_1, stone_2, stone_3, stone_4};
                         for (movingStones stone : movingStonesArray) {
-                            stone.stopThread();
+//                            stone.stopThread();
                         }
                         
                         try {
@@ -814,13 +845,13 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
     	for (int i=0; i < mineCartsArray.length; i++) {
     		mineCartsArray[i].setMiner(miner);
     		mineCartsArray[i].setMinerLabel(lblMiner);
-    		mineCartsArray[i].stopThread();
+//    		mineCartsArray[i].stopThread();
     	}
     	
     	for (int i=0; i < movingStonesArray.length; i++) {
     		movingStonesArray[i].setMiner(miner);
     		movingStonesArray[i].setMinerLabel(lblMiner);
-    		movingStonesArray[i].stopThread();
+//    		movingStonesArray[i].stopThread();
     	}
     }
     
@@ -870,5 +901,31 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
 		
 	    startGame();
 	}
+    
+    public void updateMinerPosition(int x, int y) {
+        miner.setX(x);
+        miner.setY(y);
+        lblMiner.setLocation(x, y);
+    }
+    
+    public void updateMineCartPosition(int i, int x, int y) {
+    	
+    	MineCarts[] mineCartsArray = {minecart_1, minecart_2, minecart_3, minecart_4};
+    	JLabel[] lblMineCarts = {lblMinecart_1, lblMinecart_2, lblMinecart_3, lblMinecart_4};
+    	
+    	mineCartsArray[i].setX(x);
+    	mineCartsArray[i].setY(y);
+    	lblMineCarts[i].setLocation(x, y);
+    }
+    
+    public void updateStonePosition(int i, int x, int y) {
+    	
+    	movingStones[] movingStonesArray = {stone_1, stone_2, stone_3, stone_4};
+    	JLabel[] lblStones = {lblStone_1, lblStone_2, lblStone_3, lblStone_4};
+    	
+    	movingStonesArray[i].setX(x);
+    	movingStonesArray[i].setY(y);
+    	lblStones[i].setLocation(x, y);
+    }
 }
 
