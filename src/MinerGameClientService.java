@@ -1,17 +1,22 @@
+import java.awt.Component;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Scanner;
+
+import javax.swing.JLabel;
 
 public class MinerGameClientService implements Runnable {
 
 	private Socket s;
 	private Scanner in;
-	private ClientPrep client;
+	private Miner miner;
+	private JLabel lblMiner;
 
 	
-	public MinerGameClientService(Socket aSocket, ClientPrep client) {
+	public MinerGameClientService(Socket aSocket, Miner miner, JLabel lblMiner) {
 		this.s = aSocket;
-		this.client = client;
+		this.miner = miner;
+		this.lblMiner = lblMiner;
 	}
 
 	public void run() {
@@ -31,7 +36,7 @@ public class MinerGameClientService implements Runnable {
 	}
 	
 	public void processRequest () throws IOException {
-		//if next request is empty then return
+		
 		while(true) {
 			if(!in.hasNext( )){
 				return;
@@ -52,13 +57,15 @@ public class MinerGameClientService implements Runnable {
 		int y = in.nextInt();
 	
 		if ( command.equals("MINER")) {
-			client.updateMinerPosition(x, y);
+			miner.setX(x);
+			miner.setY(y);
+			lblMiner.setLocation(miner.getX(), miner.getY());
 			
 		} else if (command.equals("STONE")) {
-			client.updateStonePosition(id, x, y);
+			
 			
 		} else if (command.equals("MINECART")) {
-			client.updateMineCartPosition(id, x, y);
+			
 			
 		}
 	}

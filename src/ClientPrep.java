@@ -558,7 +558,7 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
 						Socket s2;
 						try {
 							s2 = client.accept();
-							MinerGameClientService myService = new MinerGameClientService (s2, this);
+							MinerGameClientService myService = new MinerGameClientService (s2, miner, lblMiner);
 							Thread t2 = new Thread(myService);
 							t2.start();
 								
@@ -901,31 +901,7 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
 		
 	    startGame();
 	}
-    
-    public void updateMinerPosition(int x, int y) {
-        miner.setX(x);
-        miner.setY(y);
-        lblMiner.setLocation(x, y);
-    }
-    
-    public void updateMineCartPosition(int i, int x, int y) {
-    	
-    	MineCarts[] mineCartsArray = {minecart_1, minecart_2, minecart_3, minecart_4};
-    	JLabel[] lblMineCarts = {lblMinecart_1, lblMinecart_2, lblMinecart_3, lblMinecart_4};
-    	
-    	mineCartsArray[i].setX(x);
-    	mineCartsArray[i].setY(y);
-    	lblMineCarts[i].setLocation(x, y);
-    }
-    
-    public void updateStonePosition(int i, int x, int y) {
-    	
-    	movingStones[] movingStonesArray = {stone_1, stone_2, stone_3, stone_4};
-    	JLabel[] lblStones = {lblStone_1, lblStone_2, lblStone_3, lblStone_4};
-    	
-    	movingStonesArray[i].setX(x);
-    	movingStonesArray[i].setY(y);
-    	lblStones[i].setLocation(x, y);
-    }
+        
+   
 }
 
