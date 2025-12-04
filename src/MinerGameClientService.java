@@ -51,12 +51,11 @@ public class MinerGameClientService implements Runnable {
 	}
 	
 	public void executeCommand(String command) throws IOException{
-		
-		int id = in.nextInt();
-		int x = in.nextInt();
-		int y = in.nextInt();
 	
 		if ( command.equals("MINER")) {
+
+            int x = in.nextInt();
+            int y = in.nextInt();
 			miner.setX(x);
 			miner.setY(y);
 			lblMiner.setLocation(miner.getX(), miner.getY());
