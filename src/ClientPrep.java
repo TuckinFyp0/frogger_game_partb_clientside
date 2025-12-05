@@ -128,10 +128,10 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
         endChest = new EndChest(100, 250, 100, 200,"chest.png");
         
         //Mine Carts
-		minecart_1 = new MineCarts(0, 0, 120, 200, "minecartEmpty.png", false);
-		minecart_2 = new MineCarts(0, 0, 120, 120, "minecartCoal.png", false);
-		minecart_3 = new MineCarts(0, 0, 120, 120, "minecartEmpty.png", false);
-		minecart_4 = new MineCarts(0, 0, 120, 120, "minecartCoal.png", false);
+		minecart_1 = new MineCarts(0, 0, 120, 200, "minecartEmpty.png");
+		minecart_2 = new MineCarts(0, 0, 120, 120, "minecartCoal.png");
+		minecart_3 = new MineCarts(0, 0, 120, 120, "minecartEmpty.png");
+		minecart_4 = new MineCarts(0, 0, 120, 120, "minecartCoal.png");
 		
 		//Stones
         stone_1 = new movingStones(0, 0, 120, 120, "stone.png", false);
@@ -335,10 +335,6 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
 		minecart_1.setWidth(80);
 		minecart_1.setHeight(80);
 		minecart_1.setImage("imageAssets//minecartCoal.png");
-		minecart_1.setMoving(false);
-		minecart_1.setGame(this);
-		minecart_1.setSpeed(250);
-		minecart_1.setDirection(-1);
 		
 	    lblMinecart_1 = new JLabel();
 	    // Image scaling
@@ -357,10 +353,6 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
 		minecart_2.setWidth(80);
 		minecart_2.setHeight(80);
 		minecart_2.setImage("imageAssets//minecartEmpty.png");
-		minecart_2.setMoving(false);
-		minecart_2.setGame(this);
-		minecart_2.setSpeed(300);
-		minecart_2.setDirection(1);
 		
 	    lblMinecart_2 = new JLabel();
 	    // Image scaling
@@ -379,10 +371,6 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
  		minecart_3.setWidth(80);
  		minecart_3.setHeight(80);
  		minecart_3.setImage("imageAssets//minecartCoal.png");
- 		minecart_3.setMoving(false);
- 		minecart_3.setGame(this);
- 		minecart_3.setSpeed(200);
-		minecart_3.setDirection(-1);
  		
  	    lblMinecart_3 = new JLabel();
  	    // Image scaling
@@ -401,10 +389,6 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
 		minecart_4.setWidth(80);
 		minecart_4.setHeight(80);
 		minecart_4.setImage("imageAssets//minecartEmpty.png");
-		minecart_4.setMoving(false);
-		minecart_4.setGame(this);
-		minecart_4.setSpeed(300);
-		minecart_4.setDirection(1);
 		
 	    lblMinecart_4 = new JLabel();
 	    // Image scaling
@@ -547,6 +531,9 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
 		contentPane.addKeyListener(this);
 		contentPane.setFocusable(true);
 		gameOverMenu.setVisible(false);
+
+        MineCarts[] mineCartsArray = {minecart_1, minecart_2, minecart_3, minecart_4};
+        JLabel[] lblMineCarts = {lblMinecart_1, lblMinecart_2, lblMinecart_3, lblMinecart_4};
 		
 		Thread t1 = new Thread (() -> {	
 				ServerSocket client;
@@ -558,7 +545,7 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
 						Socket s2;
 						try {
 							s2 = client.accept();
-							MinerGameClientService myService = new MinerGameClientService (s2, miner, lblMiner);
+							MinerGameClientService myService = new MinerGameClientService (s2, miner, lblMiner, mineCartsArray, lblMineCarts);
 							Thread t2 = new Thread(myService);
 							t2.start();
 								
@@ -680,12 +667,7 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
         
 		// Moving Stones Array
 	    movingStones[] movingStonesArray = {stone_1, stone_2, stone_3, stone_4};
-    	
-    	for (int i=0; i < mineCartsArray.length; i++) {
-    		mineCartsArray[i].setMiner(miner);
-    		mineCartsArray[i].setMinerLabel(lblMiner);
-//    		mineCartsArray[i].startThread();
-    	}
+
     	
     	for (int i=0; i < movingStonesArray.length; i++) {
     		movingStonesArray[i].setMiner(miner);
@@ -718,18 +700,6 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
         
 		// Moving Stones Array
 	    movingStones[] movingStonesArray = {stone_1, stone_2, stone_3, stone_4};
-    	
-    	for (int i=0; i < mineCartsArray.length; i++) {
-    		mineCartsArray[i].setMiner(miner);
-    		mineCartsArray[i].setMinerLabel(lblMiner);
-//    		mineCartsArray[i].stopThread();
-    	}
-    	
-    	for (int i=0; i < movingStonesArray.length; i++) {
-    		movingStonesArray[i].setMiner(miner);
-    		movingStonesArray[i].setMinerLabel(lblMiner);
-//    		movingStonesArray[i].stopThread();
-    	}
     }
     
     // isOnAnyStone Function - checks if miner is on any of the stones while in the lava area
@@ -843,9 +813,7 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
 	    movingStones[] movingStonesArray = {stone_1, stone_2, stone_3, stone_4};
     	
     	for (int i=0; i < mineCartsArray.length; i++) {
-    		mineCartsArray[i].setMiner(miner);
-    		mineCartsArray[i].setMinerLabel(lblMiner);
-//    		mineCartsArray[i].stopThread();
+
     	}
     	
     	for (int i=0; i < movingStonesArray.length; i++) {
@@ -860,48 +828,18 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
 	    
     	stopCollisionChecker();
 	    gameOverMenu.setVisible(false);
-	    miner.setX(212);
-		miner.setY(550);
-		
-		miner.setImage("imageAssets//minerFacingFront.png");
-		lblMiner.setLocation(miner.getX(), miner.getY());
-		updateMinerImage();
-		
-		minecart_1.setX(375);
-	    minecart_1.setY(515);
-	    lblMinecart_1.setLocation(minecart_1.getX(), minecart_1.getY());
-	    
-	    minecart_2.setX(480);
-	    minecart_2.setY(415);
-	    lblMinecart_2.setLocation(minecart_2.getX(), minecart_2.getY());
-	    
-	    minecart_3.setX(175);
-	    minecart_3.setY(315);
-	    lblMinecart_3.setLocation(minecart_3.getX(), minecart_3.getY());
-	    
-	    minecart_4.setX(75);
-	    minecart_4.setY(415);
-	    lblMinecart_4.setLocation(minecart_4.getX(), minecart_4.getY());
-	    
-	    stone_1.setX(360);
-	    stone_1.setY(160);
-	    lblStone_1.setLocation(stone_1.getX(), stone_1.getY());
-	    
-	    stone_2.setX(0);
-	    stone_2.setY(210);
-	    lblStone_2.setLocation(stone_2.getX(), stone_2.getY());
-	    
-	    stone_3.setX(300);
-	    stone_3.setY(210);
-	    lblStone_3.setLocation(stone_3.getX(), stone_3.getY());
-	    
-	    stone_4.setX(210);
-	    stone_4.setY(260);
-	    lblStone_4.setLocation(stone_4.getX(), stone_4.getY());
+
+        try {
+            Socket s = new Socket("localhost", SERVER_PORT);
+            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+            out.println("RESETGAME");
+            out.flush();
+            s.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 		
 	    startGame();
 	}
-        
-   
 }
 

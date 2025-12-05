@@ -11,12 +11,16 @@ public class MinerGameClientService implements Runnable {
 	private Scanner in;
 	private Miner miner;
 	private JLabel lblMiner;
+    private MineCarts[] mineCartsArray;
+    private JLabel[] lblMineCarts;
 
 	
-	public MinerGameClientService(Socket aSocket, Miner miner, JLabel lblMiner) {
+	public MinerGameClientService(Socket aSocket, Miner miner, JLabel lblMiner, MineCarts[] mineCartsArray, JLabel[] lblMineCarts) {
 		this.s = aSocket;
 		this.miner = miner;
 		this.lblMiner = lblMiner;
+        this.mineCartsArray = mineCartsArray;
+        this.lblMineCarts = lblMineCarts;
 	}
 
 	public void run() {
@@ -32,7 +36,7 @@ public class MinerGameClientService implements Runnable {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}	
+		}
 	}
 	
 	public void processRequest () throws IOException {
@@ -64,8 +68,13 @@ public class MinerGameClientService implements Runnable {
 			
 			
 		} else if (command.equals("MINECART")) {
-			
-			
+			int index = in.nextInt();
+            int x = in.nextInt();
+            int y = in.nextInt();
+
+            mineCartsArray[index].setX(x);
+            mineCartsArray[index].setY(y);
+            lblMineCarts[index].setLocation(x, y);
 		}
 	}
 	
