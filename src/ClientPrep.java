@@ -534,6 +534,9 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
 
         MineCarts[] mineCartsArray = {minecart_1, minecart_2, minecart_3, minecart_4};
         JLabel[] lblMineCarts = {lblMinecart_1, lblMinecart_2, lblMinecart_3, lblMinecart_4};
+
+        movingStones[] stonesArray = {stone_1, stone_2, stone_3, stone_4};
+        JLabel[] lblStones = {lblStone_1, lblStone_2, lblStone_3, lblStone_4};
 		
 		Thread t1 = new Thread (() -> {	
 				ServerSocket client;
@@ -545,7 +548,7 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
 						Socket s2;
 						try {
 							s2 = client.accept();
-							MinerGameClientService myService = new MinerGameClientService (s2, miner, lblMiner, mineCartsArray, lblMineCarts);
+							MinerGameClientService myService = new MinerGameClientService (s2, miner, lblMiner, mineCartsArray, lblMineCarts, stonesArray, lblStones);
 							Thread t2 = new Thread(myService);
 							t2.start();
 								
@@ -635,16 +638,7 @@ public class ClientPrep extends JFrame implements KeyListener, ActionListener {
 				ex.printStackTrace();
 			}
 		}
-		
-//		miner.setX(x);
-//		miner.setY(y);
-//		
-//		lblMiner.setLocation(miner.getX(), miner.getY() );
-//		
-//		if (miner.getY() <= -10) {
-//			gameWon();
-//		}
-		
+
 	}
     
     @Override
